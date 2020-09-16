@@ -5,28 +5,51 @@ import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import HabitItem from '../components/HabitItem';
 import Spacer from '../components/Spacer';
 import habitApi from '../api/habitApi';
-const axios = require('axios');
+import { getTodayEntry, createEntry } from '../repository/entriesRepository';
+import { getHabits } from '../repository/habitsRepository';
+import { diaryEntryToHabitList } from '../helpers/dataTransform';
 
 const HabitScreen = ({ navigation }) => {
 
-    const [habits, setHabits] = useState([]);
+    const [habitEntry, setHabitEntry] = useState([]);
+
+    const toggleCompleteStatus = (id) => {
+
+        const newHabitEntry = habitEntry.map((entry) => {
+            if (entry._id === id) {
+                return { ...entry, done: !entry.done };
+            } else {
+                return { ...entry };
+            }
+        });
+
+        setHabitEntry(newHabitEntry);
+    }
+
 
     useEffect(() => {
         const fetchData = async () => {
-            const todayEntry = await habitApi.get('/entry/today');
-            if (todayEntry.data.length != 0) {
-                setHabits(todayEntry.data);
-                console.log("hit here -- there is data");
+            const todayEntry = getTodayEntry();
+
+            if (todayEntry.length != 0) {
+                setHabitEntry(diaryEntryToHabitList(todayEntry));
+
             } else {
-                console.log("hit else, new data! ");
-                const returnedHabits = await habitApi.get('/habit');
-                let newListofHabits = []
-                let data = returnedHabits.data["0"];
+                const habits = getHabits();
+                let newEntries = [];
+                let newHabitList = [];
+
                 for (let habit of data) {
-                    habit["complete"] = false;
-                    newListofHabits.push(habit);
+                    newHabitList.push({ ...habit, done: false, notes: "" });
+                    newEntries.push({ habit: habit._id, done: false, notes: "" });
                 }
-                setHabits(newListofHabits);
+                setHabitEntry(newHabitList);
+
+                try {
+                    await habitApi.post('/entry', { date: new Date(), entry: newEntries });
+                } catch (e) {
+                    console.log(e);
+                }
             }
         }
         fetchData();
@@ -37,12 +60,13 @@ const HabitScreen = ({ navigation }) => {
             <Spacer />
             <FlatList
                 keyExtractor={(item) => item._id}
-                data={habits}
+                data={habitEntry}
                 renderItem={({ item }) => {
                     return (
                         <HabitItem
                             item={item}
                             navigation={navigation}
+                            toggleCompleteStatus={toggleCompleteStatus}
                         ></HabitItem>
                     )
                 }}

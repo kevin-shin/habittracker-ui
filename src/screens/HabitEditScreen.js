@@ -26,7 +26,6 @@ const HabitEditScreen = (props) => {
     const [habitName, setHabitName] = useState(props.route.params.item.name);
     const [repeat, setRepeat] = useState(props.route.params.item.repeat);
     const [remindTime, setRemindTime] = useState(props.route.params.item.remindTime);
-    console.log(props.route.params.item);
 
     return (
         <>

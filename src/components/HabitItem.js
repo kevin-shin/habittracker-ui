@@ -8,16 +8,14 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { noAuto } from '@fortawesome/fontawesome-svg-core';
 
-const HabitItem = ({ navigation, item }) => {
-
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
+const HabitItem = ({ navigation, item, toggleCompleteStatus }) => {
 
     return (
         <View style={styles.container}>
             <CheckBox
-                isChecked={toggleCheckBox}
+                isChecked={item.done}
                 onClick={() => {
-                    setToggleCheckBox(!toggleCheckBox)
+                    toggleCompleteStatus(item._id);
                 }
                 }
                 style={styles.checkBox}
