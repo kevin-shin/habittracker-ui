@@ -5,52 +5,51 @@ import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import HabitItem from '../components/HabitItem';
 import Spacer from '../components/Spacer';
 import habitApi from '../api/habitApi';
-import { getTodayEntry, createEntry } from '../repository/entriesRepository';
+import { getTodayEntry, createEntry, updateEntry } from '../repository/entriesRepository';
 import { getHabits } from '../repository/habitsRepository';
-import { diaryEntryToHabitList } from '../helpers/dataTransform';
+import { diaryEntryToHabitList, habitToEntryForm } from '../helpers/dataTransform';
 
 const HabitScreen = ({ navigation }) => {
 
     const [habitEntry, setHabitEntry] = useState([]);
+    const [entryId, setEntryId] = useState("");
 
-    const toggleCompleteStatus = (id) => {
-
-        const newHabitEntry = habitEntry.map((entry) => {
+    const toggleCompleteStatus = async (id) => {
+        let newHabitEntry = habitEntry.map((entry) => {
             if (entry._id === id) {
-                return { ...entry, done: !entry.done };
+                return { ...entry, done: entry.done ? !entry.done : true };
             } else {
                 return { ...entry };
             }
         });
 
+        newHabitEntry = await updateEntry(entryId, newHabitEntry);
         setHabitEntry(newHabitEntry);
     }
 
 
     useEffect(() => {
         const fetchData = async () => {
-            const todayEntry = getTodayEntry();
+            let data;
+            let id;
 
-            if (todayEntry.length != 0) {
-                setHabitEntry(diaryEntryToHabitList(todayEntry));
-
+            const todayEntryData = await getTodayEntry();
+            if (todayEntryData.length != 0) {
+                const todayEntry = todayEntryData[0].entry;
+                
+                data = diaryEntryToHabitList(todayEntry);
+                id = todayEntryData[0]._id;
             } else {
-                const habits = getHabits();
-                let newEntries = [];
-                let newHabitList = [];
+                let habits = await getHabits();
+                let newEntries = habits.map(item => habitToEntryForm(item));
+                let newEntry = await createEntry(new Date(), newEntries);
 
-                for (let habit of data) {
-                    newHabitList.push({ ...habit, done: false, notes: "" });
-                    newEntries.push({ habit: habit._id, done: false, notes: "" });
-                }
-                setHabitEntry(newHabitList);
-
-                try {
-                    await habitApi.post('/entry', { date: new Date(), entry: newEntries });
-                } catch (e) {
-                    console.log(e);
-                }
+                data = diaryEntryToHabitList(newEntry.entry);
+                id = newEntry._id;
             }
+
+            setHabitEntry(data);
+            setEntryId(id);
         }
         fetchData();
     }, []);

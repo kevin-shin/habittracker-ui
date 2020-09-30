@@ -9,7 +9,7 @@ const habitToEntryForm = (habit, done = false, notes = "") => {
 }
 
 const diaryEntryToHabitList = (diaryEntry) => {
-    let habitList = diaryEntry[0].entry.map(x => {
+    let habitList = diaryEntry.map(x => {
         return {
             ...x.habit, done: x.done, notes: x.notes
         }
@@ -20,4 +20,4 @@ const diaryEntryToHabitList = (diaryEntry) => {
 
 
 
-export { diaryEntryToHabitList };
+export { diaryEntryToHabitList, habitToEntryForm };
