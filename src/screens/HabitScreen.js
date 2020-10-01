@@ -22,7 +22,6 @@ const HabitScreen = ({ navigation }) => {
                 return { ...entry };
             }
         });
-
         newHabitEntry = await updateEntry(entryId, newHabitEntry);
         setHabitEntry(newHabitEntry);
     }
@@ -35,17 +34,22 @@ const HabitScreen = ({ navigation }) => {
 
             const todayEntryData = await getTodayEntry();
             if (todayEntryData.length != 0) {
+                console.log("HIT TODAY ENTRY");
                 const todayEntry = todayEntryData[0].entry;
-                
+
                 data = diaryEntryToHabitList(todayEntry);
                 id = todayEntryData[0]._id;
+
+                console.log(data);
             } else {
+                console.log("hit else");
                 let habits = await getHabits();
                 let newEntries = habits.map(item => habitToEntryForm(item));
                 let newEntry = await createEntry(new Date(), newEntries);
 
                 data = diaryEntryToHabitList(newEntry.entry);
                 id = newEntry._id;
+                console.log(data);
             }
 
             setHabitEntry(data);

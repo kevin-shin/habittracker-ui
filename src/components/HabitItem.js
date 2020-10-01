@@ -22,7 +22,7 @@ const HabitItem = ({ navigation, item, toggleCompleteStatus }) => {
             />
             <Text style={styles.textStyle}>{item.name}</Text>
             <TouchableOpacity
-                onPress={() => navigation.navigate("Edit Habit", { item })}
+                onPress={() => navigation.navigate("Edit Habit", { item, navigation })}
                 style={styles.editButton}
             >
                 <FontAwesomeIcon icon={faEdit} />
