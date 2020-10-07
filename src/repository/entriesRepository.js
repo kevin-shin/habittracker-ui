@@ -19,8 +19,10 @@ const createEntry = async (date, entry) => {
 // UPDATE
 const updateEntry = async (id, entry) => {
     try {
+        console.log("UPDATED ENTRY BEFORE");
+        console.log(entry);
         let updatedEntry = await habitApi.put('/entry', { id, entry });
-        return updatedEntry;
+        return updatedEntry.data;
     } catch (e) {
         console.log(e);
     }

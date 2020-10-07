@@ -1,40 +1,17 @@
 import React, { useState } from 'react';
-import { Text, TextInput, StyleSheet, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import { withNavigation } from 'react-navigation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Spacer from '../components/Spacer';
 import habitApi from '../api/habitApi';
-
-
-const updateHabit = async (habitEntry) => {
-    const updatedHabit = {
-        name: habitEntry.name,
-        remindTime: new Date(habitEntry.remindTime).getTime(),
-        repeat: habitEntry.repeat,
-        id: habitEntry._id
-    };
-
-    try {
-        const newHabit = await habitApi.put("/habit", updatedHabit);
-    }
-    catch (e) {
-        console.log(e);
-    }
-}
-
-const deleteHabit = async (id) => {
-    try {
-        await habitApi.delete("/habit", { id })
-    }
-    catch (e) {
-        console.log(e);
-    }
-}
+import styles from '../../styles/HabitEditScreenStyles';
+import { updateHabit, deleteHabit } from '../repository/habitsRepository';
 
 const HabitEditScreen = (props) => {
     const item = props.route.params.item;
     const navigation = props.route.params.navigation;
+    const isNewHabit = props.route.params.isNewHabit;
 
     const [habitEntry, setHabitEntry] = useState({
         ...item, remindTime: new Date(item.remindTime)
@@ -112,73 +89,26 @@ const HabitEditScreen = (props) => {
             <TouchableOpacity
                 style={styles.saveButton}
                 onPress={() => {
-                    updateHabit(habitEntry);
+                    updateHabit(habitEntry._id, habitEntry);
                     navigation.navigate("Habits");
                 }}
             >
                 <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            {!isNewHabit && <TouchableOpacity
                 onPress={() => deleteHabit(habitEntry._id)}
             >
                 <Text style={styles.deleteButtonText}>Delete Habit</Text>
             </TouchableOpacity>
-
+            }
+            <TouchableOpacity
+                onPress={() => navigation.navigate("Habits")}
+            >
+                <Text style={styles.deleteButtonText}>Cancel</Text>
+            </TouchableOpacity>
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    habitName: {
-        height: 50,
-        fontSize: 25,
-        paddingLeft: 40,
-        paddingRight: 20,
-        marginBottom: 10
-    },
-    saveButton: {
-        alignSelf: "center",
-        backgroundColor: "#1261A0",
-        borderRadius: 10
-    },
-    deleteButtonText: {
-        alignSelf: "center",
-        marginTop: 45,
-        fontSize: 22,
-        color: "#1261A0"
-    },
-    buttonText: {
-        fontSize: 25,
-        color: "white",
-        padding: 15,
-        paddingLeft: 25,
-        paddingRight: 25
-    },
-    checkBoxContainer: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        marginBottom: 10
-    },
-    weekday: {
-        alignSelf: "flex-start",
-        padding: 15,
-        marginLeft: 12,
-        marginRight: 12
-    },
-    checkedWeekday: {
-        backgroundColor: "gray"
-    },
-    uncheckedWeekday: {
-        backgroundColor: "white"
-    },
-    remindTimeText: {
-        fontSize: 20,
-        marginLeft: 40,
-        marginTop: 30
-    }
-})
-
 
 export default withNavigation(HabitEditScreen);

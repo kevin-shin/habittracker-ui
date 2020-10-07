@@ -16,13 +16,14 @@ const HabitItem = ({ navigation, item, toggleCompleteStatus }) => {
                 isChecked={item.done}
                 onClick={() => {
                     toggleCompleteStatus(item._id);
+                    // console.log("hit here");
                 }
                 }
                 style={styles.checkBox}
             />
             <Text style={styles.textStyle}>{item.name}</Text>
             <TouchableOpacity
-                onPress={() => navigation.navigate("Edit Habit", { item, navigation })}
+                onPress={() => navigation.navigate("Edit Habit", { item, navigation, isNewHabit: false })}
                 style={styles.editButton}
             >
                 <FontAwesomeIcon icon={faEdit} />
@@ -43,9 +44,9 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     textStyle: {
-        fontSize: 25,
+        fontSize: 20,
         marginLeft: 50,
-        flex: 15
+        flex: 30
     },
     editButton: {
         marginLeft: "auto",
@@ -53,6 +54,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginRight: 30
     }
-})
+});
 
 export default withNavigation(HabitItem);

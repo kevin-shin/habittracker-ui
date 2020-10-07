@@ -4,10 +4,10 @@ import { Text, Button, StyleSheet } from 'react-native';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import HabitItem from '../components/HabitItem';
 import Spacer from '../components/Spacer';
-import habitApi from '../api/habitApi';
 import { getTodayEntry, createEntry, updateEntry } from '../repository/entriesRepository';
 import { getHabits } from '../repository/habitsRepository';
 import { diaryEntryToHabitList, habitToEntryForm } from '../helpers/dataTransform';
+import styles from '../../styles/HabitScreenStyles.js';
 
 const HabitScreen = ({ navigation }) => {
 
@@ -22,7 +22,7 @@ const HabitScreen = ({ navigation }) => {
                 return { ...entry };
             }
         });
-        newHabitEntry = await updateEntry(entryId, newHabitEntry);
+
         setHabitEntry(newHabitEntry);
     }
 
@@ -45,13 +45,16 @@ const HabitScreen = ({ navigation }) => {
                 console.log("hit else");
                 let habits = await getHabits();
                 let newEntries = habits.map(item => habitToEntryForm(item));
+                console.log(newEntries);
                 let newEntry = await createEntry(new Date(), newEntries);
 
                 data = diaryEntryToHabitList(newEntry.entry);
                 id = newEntry._id;
+                console.log("------------->");
                 console.log(data);
             }
-
+            console.log("***********");
+            console.log(data);
             setHabitEntry(data);
             setEntryId(id);
         }
@@ -61,10 +64,12 @@ const HabitScreen = ({ navigation }) => {
     return (
         <>
             <Spacer />
-            <FlatList
-                keyExtractor={(item) => item._id}
+            {habitEntry.length != 0 && <FlatList
+                keyExtractor={(item) => { return item._id; }}
                 data={habitEntry}
                 renderItem={({ item }) => {
+                    // console.log("00000000------->");
+                    // console.log(habitEntry); 
                     return (
                         <HabitItem
                             item={item}
@@ -74,6 +79,7 @@ const HabitScreen = ({ navigation }) => {
                     )
                 }}
             />
+            }
             <TouchableOpacity
                 style={styles.addHabitButton}
                 onPress={() => {
@@ -82,26 +88,29 @@ const HabitScreen = ({ navigation }) => {
                         "remindTime": new Date(15980517300500),
                         "repeat": {}
                     };
-                    navigation.navigate("Edit Habit", { item: newHabit });
+                    navigation.navigate("Edit Habit", {
+                        item: newHabit,
+                        navigation,
+                        isNewHabit: true
+                    });
                 }}
             >
                 <Text style={styles.addHabitButtonText}>
                     Add Habit
                 </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.addHabitButton}
+                onPress={async () => { await updateEntry(entryId, habitEntry); }}
+            >
+                <Text style={styles.addHabitButtonText}>
+                    Submit Entry
+                </Text>
+            </TouchableOpacity>
+
 
         </>
     );
 }
 
-const styles = StyleSheet.create({
-    addHabitButton: {
-        marginBottom: 20,
-        alignSelf: "center"
-    },
-    addHabitButtonText: {
-        fontSize: 20,
-        color: "blue"
-    }
-})
 export default HabitScreen;
