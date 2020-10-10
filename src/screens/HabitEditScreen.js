@@ -7,14 +7,14 @@ import Spacer from '../components/Spacer';
 import habitApi from '../api/habitApi';
 import styles from '../../styles/HabitEditScreenStyles';
 import { updateHabit, deleteHabit } from '../repository/habitsRepository';
+import { updateEntry } from '../repository/entriesRepository';
 
 const HabitEditScreen = (props) => {
     const item = props.route.params.item;
     const navigation = props.route.params.navigation;
     const isNewHabit = props.route.params.isNewHabit;
-
     const [habitEntry, setHabitEntry] = useState({
-        ...item, remindTime: new Date(item.remindTime)
+        ...item.habit, remindTime: new Date(item.habit.remindTime)
     });
 
     return (
@@ -88,8 +88,9 @@ const HabitEditScreen = (props) => {
             <Spacer />
             <TouchableOpacity
                 style={styles.saveButton}
-                onPress={() => {
-                    updateHabit(habitEntry._id, habitEntry);
+                onPress={async () => {
+                    await updateHabit(habitEntry._id, habitEntry);
+                    await updateEntry(habitEntry._id, habitEntry);
                     navigation.navigate("Habits");
                 }}
             >
@@ -103,7 +104,10 @@ const HabitEditScreen = (props) => {
             </TouchableOpacity>
             }
             <TouchableOpacity
-                onPress={() => navigation.navigate("Habits")}
+                onPress={() => {
+                    navigation.navigate("Habits")
+                }
+                }
             >
                 <Text style={styles.deleteButtonText}>Cancel</Text>
             </TouchableOpacity>

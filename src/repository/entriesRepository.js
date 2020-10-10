@@ -1,15 +1,16 @@
 import habitApi from '../api/habitApi';
 
+
 // READ
-const getTodayEntry = async () => {
-    const todayEntry = await habitApi.get('/entry/today');
-    return todayEntry.data;
+const getEntry = async (filterConditions) => {
+    const entry = await habitApi.get('/entry', { params: { ...filterConditions } });
+    return entry.data;
 }
 
 // CREATE
 const createEntry = async (date, entry) => {
     try {
-        let newEntry = await habitApi.post('/entry', { date, entry });
+        let newEntry = await habitApi.post('/entry', { ...date, entry });
         return newEntry.data;
     } catch (e) {
         console.log(e);
@@ -19,8 +20,6 @@ const createEntry = async (date, entry) => {
 // UPDATE
 const updateEntry = async (id, entry) => {
     try {
-        console.log("UPDATED ENTRY BEFORE");
-        console.log(entry);
         let updatedEntry = await habitApi.put('/entry', { id, entry });
         return updatedEntry.data;
     } catch (e) {
@@ -28,4 +27,4 @@ const updateEntry = async (id, entry) => {
     }
 }
 
-export { getTodayEntry, createEntry, updateEntry };
+export { createEntry, updateEntry, getEntry };

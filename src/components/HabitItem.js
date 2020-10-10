@@ -16,12 +16,11 @@ const HabitItem = ({ navigation, item, toggleCompleteStatus }) => {
                 isChecked={item.done}
                 onClick={() => {
                     toggleCompleteStatus(item._id);
-                    // console.log("hit here");
                 }
                 }
                 style={styles.checkBox}
             />
-            <Text style={styles.textStyle}>{item.name}</Text>
+            <Text style={styles.textStyle}>{item.habit.name}</Text>
             <TouchableOpacity
                 onPress={() => navigation.navigate("Edit Habit", { item, navigation, isNewHabit: false })}
                 style={styles.editButton}
